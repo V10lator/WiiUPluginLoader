@@ -13,7 +13,8 @@ $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>dev
 endif
 
 export PATH			:=	$(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH):$(DEVKITPRO)/tools/bin
-export PORTLIBS		:=	$(DEVKITPRO)/portlibs/ppc
+export PORTLIBS_PPC		:=	$(DEVKITPRO)/portlibs/ppc
+export PORTLIBS_WIIU		:=	$(DEVKITPRO)/portlibs/wiiu
 
 PREFIX	:=	powerpc-eabi-
 
@@ -85,7 +86,10 @@ LIBS	:= -lgui -lm -lgcc -lfat -liosuhax -lutils -ldynamiclibs -lfreetype -lgd -l
 #---------------------------------------------------------------------------------
 LIBDIRS	:=	$(CURDIR)	\
 			$(DEVKITPPC)/lib  \
-			$(DEVKITPRO)/wups
+			$(DEVKITPRO)/wups \
+			/home/v10lator/git/libfat/wiiu/lib \
+			/home/v10lator/git/libntfs-wiiu/lib/wiiu \
+			/home/v10lator/git/libgui/lib
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -102,7 +106,6 @@ export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 #---------------------------------------------------------------------------------
 # automatically build a list of object files for our project
 #---------------------------------------------------------------------------------
-FILELIST	:=	$(shell bash ./filelist.sh)
 LANGUAGES	:=	$(shell bash ./updatelang.sh)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
@@ -130,9 +133,11 @@ export OFILES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 #---------------------------------------------------------------------------------
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-                    -I$(PORTLIBS)/include -I$(CURDIR)/$(BUILD) \
-					-I$(PORTLIBS)/include/libutils \
-                    -I$(PORTLIBS)/include/freetype2 -I$(PORTLIBS)/include/libgui
+                    -I$(PORTLIBS_PPC)/include -I$(PORTLIBS_WIIU)/include -I$(CURDIR)/$(BUILD) \
+					-I$(PORTLIBS_WIIU)/include/libutils \
+					-I$(DEVKITPRO)/wut/include \
+					-I$(PORTLIBS_PPC)/include/freetype2 \
+					-I/home/v10lator/git/libfat/include -I/home/v10lator/git/libntfs-wiiu/include -I/home/v10lator/git/libgui/include/ -I/home/v10lator/git/libgui/include/gui
 
 
 #---------------------------------------------------------------------------------

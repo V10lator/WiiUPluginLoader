@@ -18,9 +18,7 @@
 #ifndef _APPLICATION_H
 #define _APPLICATION_H
 
-#include "menu/MainWindow.h"
 #include <functional>
-#include <video/CVideo.h>
 #include <system/CThread.h>
 #include <language/gettext.h>
 
@@ -28,7 +26,7 @@
 #define APPLICATION_CLOSE_APPLY_MEMORY      3
 #define APPLICATION_CLOSE_MIIMAKER          2
 
-class Application : public CThread {
+class Application {
 public:
     static Application * instance() {
         if(!applicationInstance)
@@ -42,51 +40,13 @@ public:
         }
     }
 
-    CVideo *getVideo(void) const {
-        return video;
-    }
-    MainWindow *getMainWindow(void) const {
-        return mainWindow;
-    }
-
-    GuiSound *getBgMusic(void) const {
-        return bgMusic;
-    }
-
     int32_t exec(void);
-    void fadeOut(void);
-
-    void reloadUI(void);
-
-    void quit(int32_t code) {
-        exitCode = code;
-        exitApplication = true;
-    }
-
-    void setLinkPluginsCallback(std::function<bool(void)> fun) {
-        linkPluginsCallback = fun;
-        DEBUG_FUNCTION_LINE("Set callback to %08X \n",linkPluginsCallback);
-    }
 private:
     Application();
 
     virtual ~Application();
 
     static Application *applicationInstance;
-    static bool exitApplication;
-
-    void executeThread(void);
-
-    void loadLanguageFromConfig();
-
-    bool reloadUIflag = false;
-
-    GuiSound *bgMusic;
-    CVideo *video;
-    MainWindow *mainWindow;
-    GuiController *controller[5];
-    int32_t exitCode;
-    std::function<bool(void)> linkPluginsCallback = NULL;
 };
 
 #endif //_APPLICATION_H

@@ -3,12 +3,9 @@
 #include <dynamic_libs/vpad_functions.h>
 #include "common/retain_vars.h"
 #include "hooks_patcher.h"
-#include "myutils/overlay_helper.h"
-#include "myutils/ConfigUtils.h"
 #include "main.h"
 #include "utils.h"
 #include "mymemory/memory_mapping.h"
-#include <video/shaders/Texture2DShader.h>
 
 DECL(uint32_t, ProcUIProcessMessages, uint32_t u) {
     uint32_t res = real_ProcUIProcessMessages(u);
@@ -19,9 +16,7 @@ DECL(uint32_t, ProcUIProcessMessages, uint32_t u) {
         CallHook(WUPS_LOADER_HOOK_APP_STATUS_CHANGED);
         if(gAppStatus == WUPS_APP_STATUS_CLOSED) {
             CallHook(WUPS_LOADER_HOOK_ENDING_APPLICATION);
-            ConfigUtils::saveConfigToSD();
             DeInit();
-            Texture2DShader::destroyInstance();
         }
     }
 

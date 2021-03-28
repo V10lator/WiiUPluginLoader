@@ -58,10 +58,7 @@
 #include "myutils/mocha.h"
 #include "myutils/libntfs.h"
 #include "myutils/libfat.h"
-#include "myutils/overlay_helper.h"
-#include "myutils/ConfigUtils.h"
 #include "version.h"
-#include "settings/CSettings.h"
 
 static void ApplyPatchesAndCallHookStartingApp();
 static void RestorePatches();
@@ -103,9 +100,6 @@ extern "C" int32_t Menu_Main(int32_t argc, char **argv) {
 
     gGameTitleID = OSGetTitleID();
 
-    g_vid_ownContextState = NULL;
-    g_vid_originalContextSave = NULL;
-
     int32_t result = 0;
 
     //Reset everything when were going back to the Mii Maker
@@ -136,17 +130,11 @@ extern "C" int32_t Menu_Main(int32_t argc, char **argv) {
 
         DEBUG_FUNCTION_LINE("Release memory\n");
         memoryRelease();
-        CSettings::destroyInstance();
         PluginLoader::destroyInstance();
 
         MemoryUtils::init();
 
         // Memory on custon heap is reset anyway so we don't need to free the image buffers.
-        memset((void*)&g_vid_main_cbuf,0,sizeof(g_vid_main_cbuf));
-        memset((void*)&g_vid_drcTex,0,sizeof(g_vid_drcTex));
-        memset((void*)&g_vid_tvTex,0,sizeof(g_vid_tvTex));
-        g_vid_originalContextSave = NULL;
-        g_vid_ownContextState = NULL;
         g_NotInLoader = false;
     } else {
         g_NotInLoader = true;
@@ -190,7 +178,6 @@ extern "C" int32_t Menu_Main(int32_t argc, char **argv) {
         CallHook(WUPS_LOADER_HOOK_INIT_KERNEL);
         CallHook(WUPS_LOADER_HOOK_INIT_FS);
         CallHook(WUPS_LOADER_HOOK_INIT_OVERLAY);
-        ConfigUtils::loadConfigFromSD();
         CallHook(WUPS_LOADER_HOOK_INIT_PLUGIN);
         DEBUG_FUNCTION_LINE("Loading the system menu.\n");
         DeInit();
@@ -244,8 +231,6 @@ int32_t isInMiiMakerHBL() {
 }
 
 void Init() {
-    memset(&tv_store,0,sizeof(tv_store));
-    memset(&drc_store,0,sizeof(drc_store));
     DEBUG_FUNCTION_LINE("Mount SD partition\n");
     Init_SD_USB();
 }
