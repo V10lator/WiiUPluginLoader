@@ -34,7 +34,7 @@ print-%  : ; @echo $* = $($*)
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET    :=  wiiupluginloader
+TARGET    :=  wiiupluginautoloader
 BUILD     :=  build
 BUILD_DBG	:=  $(TARGET)_dbg
 SOURCES   :=  src/common \
