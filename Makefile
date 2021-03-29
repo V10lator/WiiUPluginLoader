@@ -12,19 +12,19 @@ ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>devkitPRO")
 endif
 
-include $(DEVKITPRO)/wut/share/wut_rules
+#include $(DEVKITPRO)/wut/share/wut_rules
 
-#export PATH			:=	$(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH):$(DEVKITPRO)/tools/bin
+export PATH			:=	$(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH):$(DEVKITPRO)/tools/bin
 export PORTLIBS_PPC		:=	$(DEVKITPRO)/portlibs/ppc
 export PORTLIBS_WIIU		:=	$(DEVKITPRO)/portlibs/wiiu
 
-#PREFIX	:=	powerpc-eabi-
+PREFIX	:=	powerpc-eabi-
 
-#export AS	:=	$(PREFIX)as
-#export CC	:=	$(PREFIX)gcc
-#export CXX	:=	$(PREFIX)g++
-#export AR	:=	$(PREFIX)ar
-#export OBJCOPY	:=	$(PREFIX)objcopy
+export AS	:=	$(PREFIX)as
+export CC	:=	$(PREFIX)gcc
+export CXX	:=	$(PREFIX)g++
+export AR	:=	$(PREFIX)ar
+export OBJCOPY	:=	$(PREFIX)objcopy
 
 print-%  : ; @echo $* = $($*)
 
