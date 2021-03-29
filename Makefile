@@ -87,6 +87,7 @@ LIBS	:= -lgui -lm -lgcc -lfat -liosuhax -lutils -ldynamiclibs -lfreetype -lgd -l
 # include and lib
 #---------------------------------------------------------------------------------
 LIBDIRS	:=	$(CURDIR)	\
+			/home/v10lator/git/libiosuhax/inst/lib \
 			$(PORTLIBS_PPC)/lib \
 			$(PORTLIBS_WIIU)/lib \
 			$(DEVKITPPC)/lib  \
@@ -135,7 +136,7 @@ export OFILES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 # build a list of include paths
 #---------------------------------------------------------------------------------
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+					-I/home/v10lator/git/libiosuhax/inst/include \
                     -I$(PORTLIBS_PPC)/include -I$(PORTLIBS_WIIU)/include -I$(CURDIR)/$(BUILD) \
 					-I$(PORTLIBS_WIIU)/include/libutils \
 					-I$(DEVKITPRO)/wut/include \
