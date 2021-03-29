@@ -39,26 +39,26 @@ int32_t Application::exec() {
         
         for (std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it) {
                 PluginInformation * curPlugin = *it;
+                DEBUG_FUNCTION_LINE("Found %s\n",curPlugin->getName().c_str());
                 bool skip = false;
                 
                 for (std::vector<PluginInformation *>::iterator itOther = pluginListLoaded.begin() ; itOther != pluginListLoaded.end(); ++itOther) {
                         PluginInformation * otherPlugin = *itOther;
                         if(otherPlugin->getPath().compare(curPlugin->getPath()) == 0) {
+                                DEBUG_FUNCTION_LINE("Alread loaded, skipping!\n");
                                 skip = true;
                                 break;
                         }
                 }
                 if(skip)
                         continue;
-                
-                std::vector<PluginInformation*> willBeLoaded;
 
                 DEBUG_FUNCTION_LINE("We want to link %s\n",curPlugin->getName().c_str());
                 willBeLoaded.push_back(curPlugin);
         }
         
         pluginLoader->clearPluginInformation(pluginListLoaded);
-        PluginLoader::getInstance()->loadAndLinkPlugins(willBeLoaded);
+        pluginLoader->loadAndLinkPlugins(willBeLoaded);
         
         return APPLICATION_CLOSE_APPLY;
 }
