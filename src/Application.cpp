@@ -36,6 +36,7 @@ int32_t Application::exec() {
         std::vector<PluginInformation *> pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
         std::vector<PluginInformation *> pluginListLoaded = pluginLoader->getPluginsLoadedInMemory();
         std::vector<PluginInformation*> willBeLoaded;
+        DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
         
         for (std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it) {
                 PluginInformation * curPlugin = *it;
