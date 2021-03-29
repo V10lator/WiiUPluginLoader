@@ -60,5 +60,5 @@ int32_t Application::exec() {
         pluginLoader->clearPluginInformation(pluginListLoaded);
         PluginLoader::getInstance()->loadAndLinkPlugins(willBeLoaded);
         
-        return EXIT_RELAUNCH_ON_LOAD;
+        return APPLICATION_CLOSE_APPLY;
 }
