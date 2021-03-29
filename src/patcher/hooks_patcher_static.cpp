@@ -10,6 +10,7 @@
 #include "mymemory/memory_mapping.h"
 #include "myutils/mem_utils.h"
 #include "myutils/texture_utils.h"
+#include <gx2/clear.h>
 
 DECL(void, __PPCExit, void) {
     // Only continue if we are in the "right" application.
@@ -89,45 +90,10 @@ DECL(void, GX2WaitForVsync, void) {
 
 uint8_t vpadPressCooldown = 0xFF;
 
-uint8_t angleX_counter = 0;
+/*uint8_t angleX_counter = 0;
 float angleX_delta = 0.0f;
 float angleX_last = 0.0f;
-uint8_t angleX_frameCounter = 0;
-
-void checkMagic(VPADData *buffer) {
-    // buffer->angle stores the rotations per axis since the app started.
-    // Each full rotation add/subtracts 1.0f (depending on the direction).
-
-    // Check for rotation every only 5 frames.
-    angleX_frameCounter++;
-    if(angleX_frameCounter >= 5) {
-        // Get how much the gamepad rotated within the last 5 frames.
-        float diff_angle = -(buffer->angle.x - angleX_last);
-        // We want the gamepad to make (on average) at least 0.16% (1/6) of a full rotation per 5 frames (for 6 times in a row).
-        float target_diff = (0.16f);
-        // Calculate if rotated enough in this step (including the delta from the last step).
-        float total_diff = (diff_angle + angleX_delta) - target_diff;
-        if(total_diff > 0.0f) {
-            // The rotation in this step was enough.
-            angleX_counter++;
-            // When the gamepad rotated ~0.16% for 6 times in a row we made a full rotation!
-            if(angleX_counter > 5) {
-                ConfigUtils::openConfigMenu();
-                // reset stuff.
-                angleX_counter = 0;
-                angleX_delta = 0.0f;
-            } else {
-                // Save difference as it will be added on the next check.
-                angleX_delta = total_diff;
-            }
-        } else {
-            // reset counter if it stopped rotating.
-            angleX_counter = 0;
-        }
-        angleX_frameCounter = 0;
-        angleX_last = buffer->angle.x;
-    }
-}
+uint8_t angleX_frameCounter = 0;*/
 
 DECL(int32_t, VPADRead, int32_t chan, VPADData *buffer, uint32_t buffer_size, int32_t *error) {
     int32_t result = real_VPADRead(chan, buffer, buffer_size, error);
@@ -139,13 +105,6 @@ DECL(int32_t, VPADRead, int32_t chan, VPADData *buffer, uint32_t buffer_size, in
             DEBUG_FUNCTION_LINE("Memory was not mapped. To test the memory please exit the plugin loader by pressing MINUS\n");
         }
         vpadPressCooldown = 0x3C;
-    }
-
-    if(result > 0 && (buffer[0].btns_h == (VPAD_BUTTON_L | VPAD_BUTTON_DOWN | VPAD_BUTTON_MINUS)) && vpadPressCooldown == 0 && OSIsHomeButtonMenuEnabled()) {
-        ConfigUtils::openConfigMenu();
-        vpadPressCooldown = 0x3C;
-    } else if(result > 0 && OSIsHomeButtonMenuEnabled()) {
-        checkMagic(buffer);
     }
 
     if(vpadPressCooldown > 0) {
@@ -173,50 +132,50 @@ void setupContextState() {
 
 void initTextures() {
     GX2InitColorBuffer(&g_vid_main_cbuf,
-                       GX2_SURFACE_DIM_2D,
+                       GX2_SURFACE_DIM_TEXTURE_2D,
                        1280, 720, 1,
-                       GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM,
-                       GX2_AA_MODE_1X
+                       GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                       GX2_AA_MODE1X
                       );
 
-    if (g_vid_main_cbuf.surface.image_size) {
-        g_vid_main_cbuf.surface.image_data = MemoryUtils::alloc(
-                g_vid_main_cbuf.surface.image_size,
-                g_vid_main_cbuf.surface.align
+    if (g_vid_main_cbuf.surface.imageSize) {
+        g_vid_main_cbuf.surface.image = MemoryUtils::alloc(
+                g_vid_main_cbuf.surface.imageSize,
+                g_vid_main_cbuf.surface.alignment
                                              );
-        if(g_vid_main_cbuf.surface.image_data == NULL) {
+        if(g_vid_main_cbuf.surface.image == NULL) {
             OSFatal("Failed to alloc g_vid_main_cbuf\n");
         }
         DEBUG_FUNCTION_LINE("Allocated %dx%d g_vid_main_cbuf %08X\n",
                             g_vid_main_cbuf.surface.width,
                             g_vid_main_cbuf.surface.height,
-                            g_vid_main_cbuf.surface.image_data);
+                            g_vid_main_cbuf.surface.image);
     } else {
         DEBUG_FUNCTION_LINE("GX2InitTexture failed for g_vid_main_cbuf!\n");
     }
 
     GX2InitTexture(&g_vid_drcTex,
                    854, 480, 1, 0,
-                   GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM,
-                   GX2_SURFACE_DIM_2D,
+                   GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                   GX2_SURFACE_DIM_TEXTURE_2D,
                    GX2_TILE_MODE_LINEAR_ALIGNED
                   );
-    g_vid_drcTex.surface.use = (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
+    g_vid_drcTex.surface.use = (GX2SurfaceUse)(GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
 
-    if (g_vid_drcTex.surface.image_size) {
+    if (g_vid_drcTex.surface.imageSize) {
 
-        g_vid_drcTex.surface.image_data = MemoryUtils::alloc(
-                                              g_vid_drcTex.surface.image_size,
-                                              g_vid_drcTex.surface.align);
+        g_vid_drcTex.surface.image = MemoryUtils::alloc(
+                                              g_vid_drcTex.surface.imageSize,
+                                              g_vid_drcTex.surface.alignment);
 
-        if(g_vid_drcTex.surface.image_data == NULL) {
+        if(g_vid_drcTex.surface.image == NULL) {
             OSFatal("VideoSquoosher: Failed to alloc g_vid_drcTex\n");
         }
-        GX2Invalidate(GX2_INVALIDATE_CPU, g_vid_drcTex.surface.image_data, g_vid_drcTex.surface.image_size);
+        GX2Invalidate(GX2_INVALIDATE_MODE_CPU, g_vid_drcTex.surface.image, g_vid_drcTex.surface.imageSize);
         DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d g_vid_drcTex %08X\n",
                             g_vid_drcTex.surface.width,
                             g_vid_drcTex.surface.height,
-                            g_vid_drcTex.surface.image_data);
+                            g_vid_drcTex.surface.image);
 
     } else {
         DEBUG_FUNCTION_LINE("VideoSquoosher: GX2InitTexture failed for g_vid_drcTex!\n");
@@ -224,35 +183,35 @@ void initTextures() {
 
     GX2InitTexture(&g_vid_tvTex,
                    1280, 720, 1, 0,
-                   GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM,
-                   GX2_SURFACE_DIM_2D,
+                   GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8,
+                   GX2_SURFACE_DIM_TEXTURE_2D,
                    GX2_TILE_MODE_LINEAR_ALIGNED
                   );
     g_vid_tvTex.surface.use =
-        (GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
+        (GX2SurfaceUse)(GX2_SURFACE_USE_COLOR_BUFFER | GX2_SURFACE_USE_TEXTURE);
 
     DCFlushRange(&g_vid_tvTex, sizeof(GX2Texture));
 
-    if (g_vid_tvTex.surface.image_size) {
-        g_vid_tvTex.surface.image_data = MemoryUtils::alloc(
-                                             g_vid_tvTex.surface.image_size,
-                                             g_vid_tvTex.surface.align
+    if (g_vid_tvTex.surface.imageSize) {
+        g_vid_tvTex.surface.image = MemoryUtils::alloc(
+                                             g_vid_tvTex.surface.imageSize,
+                                             g_vid_tvTex.surface.alignment
                                          );
-        if(g_vid_tvTex.surface.image_data == NULL) {
+        if(g_vid_tvTex.surface.image == NULL) {
             OSFatal("VideoSquoosher: Failed to alloc g_vid_tvTex\n");
         }
-        GX2Invalidate(GX2_INVALIDATE_CPU, g_vid_tvTex.surface.image_data, g_vid_tvTex.surface.image_size);
+        GX2Invalidate(GX2_INVALIDATE_MODE_CPU, g_vid_tvTex.surface.image, g_vid_tvTex.surface.imageSize);
         DEBUG_FUNCTION_LINE("VideoSquoosher: allocated %dx%d g_vid_tvTex %08X\n",
                             g_vid_tvTex.surface.width,
                             g_vid_tvTex.surface.height,
-                            g_vid_tvTex.surface.image_data);
+                            g_vid_tvTex.surface.image);
     } else {
         DEBUG_FUNCTION_LINE("VideoSquoosher: GX2InitTexture failed for g_vid_tvTex!\n");
     }
 
     GX2InitSampler(&g_vid_sampler,
-                   GX2_TEX_CLAMP_CLAMP,
-                   GX2_TEX_XY_FILTER_BILINEAR
+                   GX2_TEX_CLAMP_MODE_CLAMP,
+                   GX2_TEX_XY_FILTER_MODE_LINEAR
                   );
 }
 
@@ -270,7 +229,7 @@ DECL_FUNCTION(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer* cbuf, int32_
         return real_GX2CopyColorBufferToScanBuffer(cbuf,target);
     }
 
-    if (!g_vid_drcTex.surface.image_data) {
+    if (!g_vid_drcTex.surface.image) {
         initTextures();
     }
 

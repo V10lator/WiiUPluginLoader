@@ -36,7 +36,7 @@
 
 #include "mymemory/memory_mapping.h"
 
-#include "common/retain_vars.h"
+//#include "common/retain_vars.h"
 #include "common/common.h"
 #include "plugin/PluginLoader.h"
 #include "plugin/PluginInformation.h"
@@ -59,6 +59,12 @@
 #include "myutils/libntfs.h"
 #include "myutils/libfat.h"
 #include "version.h"
+
+extern uint8_t gAppStatus;
+extern uint64_t gGameTitleID;
+extern bool g_NotInLoader;
+extern replacement_data_t gbl_replacement_data;
+extern volatile uint8_t gSDInitDone;
 
 static void ApplyPatchesAndCallHookStartingApp();
 static void RestorePatches();

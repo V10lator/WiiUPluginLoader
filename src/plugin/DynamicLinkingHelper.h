@@ -1,7 +1,7 @@
 #ifndef DYNAMICLINKINGHELPER_H
 #define DYNAMICLINKINGHELPER_H
 
-#include "common/retain_vars.h"
+//#include "common/retain_vars.h"
 #include "dynamic_linking_defines.h"
 #include "utils/logger.h"
 #include <string>

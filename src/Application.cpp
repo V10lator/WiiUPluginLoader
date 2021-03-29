@@ -20,6 +20,8 @@
 #include <dynamic_libs/os_functions.h>
 #include <utils/logger.h>
 #include "mymemory/memory_mapping.h"
+#include "plugin/PluginLoader.h"
+#include <vector>
 
 Application *Application::applicationInstance = NULL;
 
@@ -33,6 +35,7 @@ int32_t Application::exec() {
         PluginLoader * pluginLoader  = PluginLoader::getInstance();
         std::vector<PluginInformation *> pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
         std::vector<PluginInformation *> pluginListLoaded = pluginLoader->getPluginsLoadedInMemory();
+        std::vector<PluginInformation*> willBeLoaded;
         
         for (std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it) {
                 PluginInformation * curPlugin = *it;
@@ -52,20 +55,10 @@ int32_t Application::exec() {
 
                 DEBUG_FUNCTION_LINE("We want to link %s\n",curPlugin->getName().c_str());
                 willBeLoaded.push_back(curPlugin);
-                PluginLoader::getInstance()->loadAndLinkPlugins(willBeLoaded);
         }
         
         pluginLoader->clearPluginInformation(pluginListLoaded);
-        
-        auto fp = std::bind(&ContentHome::linkPlugins, this);
-        Application::instance()->setLinkPluginsCallback(fp);
-        
-        if(fp != NULL) {
-                std::function<bool(void)> f = fp;
-                f();
-        }
-        
-        pluginLoader->clearPluginInformation(pluginList);
+        PluginLoader::getInstance()->loadAndLinkPlugins(willBeLoaded);
         
         return EXIT_RELAUNCH_ON_LOAD;
 }

@@ -5,6 +5,7 @@
 #include "utils/logger.h"
 #include "ElfTools.h"
 #include "PluginLoader.h"
+#include "common/retain_vars.h"
 
 DynamicLinkingHelper * DynamicLinkingHelper::instance = NULL;
 

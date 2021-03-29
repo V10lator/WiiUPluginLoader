@@ -87,8 +87,10 @@ LIBS	:= -lgui -lm -lgcc -lfat -liosuhax -lutils -ldynamiclibs -lfreetype -lgd -l
 # include and lib
 #---------------------------------------------------------------------------------
 LIBDIRS	:=	$(CURDIR)	\
+			$(PORTLIBS_PPC)/lib \
+			$(PORTLIBS_WIIU)/lib \
 			$(DEVKITPPC)/lib  \
-			$(DEVKITPRO)/wups \
+			$(DEVKITPRO)/wups/lib \
 			/home/v10lator/git/libfat/wiiu/lib \
 			/home/v10lator/git/libntfs-wiiu/lib/wiiu \
 			/home/v10lator/git/libgui/lib
@@ -108,7 +110,6 @@ export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 #---------------------------------------------------------------------------------
 # automatically build a list of object files for our project
 #---------------------------------------------------------------------------------
-LANGUAGES	:=	$(shell bash ./updatelang.sh)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
@@ -138,6 +139,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
                     -I$(PORTLIBS_PPC)/include -I$(PORTLIBS_WIIU)/include -I$(CURDIR)/$(BUILD) \
 					-I$(PORTLIBS_WIIU)/include/libutils \
 					-I$(DEVKITPRO)/wut/include \
+					-I$(DEVKITPRO)/wups/include \
 					-I$(PORTLIBS_PPC)/include/freetype2 \
 					-I/home/v10lator/git/libfat/include -I/home/v10lator/git/libntfs-wiiu/include -I/home/v10lator/git/libgui/include/ -I/home/v10lator/git/libgui/include/gui
 
@@ -145,8 +147,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
-export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
-					-L$(PORTLIBS)/lib
+export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir))
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean install
