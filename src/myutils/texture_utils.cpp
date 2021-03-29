@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include "backwardComp.h"
 #include <utils/logger.h>
 #include "texture_utils.h"
 #include <wups.h>
 #include <gd.h>
-#include <dynamic_libs/gx2_functions.h>
-#include <dynamic_libs/gx2_types.h>
 #include "mem_utils.h"
+#include <gx2/event.h>
 
 void gdImageToUnormR8G8B8A8(gdImagePtr gdImg, u32 *imgBuffer, u32 width, u32 height, u32 pitch) {
     for(u32 y = 0; y < height; ++y) {
@@ -68,11 +68,11 @@ void TextureUtils::copyToTexture(GX2ColorBuffer* sourceBuffer, GX2Texture * targ
     if(sourceBuffer == NULL || target == NULL) {
         return;
     }
-    if (sourceBuffer->surface.aa == GX2_AA_MODE_1X) {
+    if (sourceBuffer->surface.aa == GX2_AA_MODE1X) {
         // If AA is disabled, we can simply use GX2CopySurface.
         GX2CopySurface(&sourceBuffer->surface,
-                       sourceBuffer->view_mip,
-                       sourceBuffer->view_first_slice,
+                       sourceBuffer->viewMip,
+                       sourceBuffer->viewFirstSlice,
                        &target->surface, 0, 0);
         GX2DrawDone();
     } else {
@@ -81,18 +81,18 @@ void TextureUtils::copyToTexture(GX2ColorBuffer* sourceBuffer, GX2Texture * targ
         // Allocate surface to resolve buffer onto
         GX2Surface tempSurface;
         tempSurface = sourceBuffer->surface;
-        tempSurface.aa = GX2_AA_MODE_1X;
+        tempSurface.aa = GX2_AA_MODE1X;
         GX2CalcSurfaceSizeAndAlignment(&tempSurface);
 
-        tempSurface.image_data = MemoryUtils::alloc(
-                                     tempSurface.image_size,
-                                     tempSurface.align
+        tempSurface.image = MemoryUtils::alloc(
+                                     tempSurface.imageSize,
+                                     tempSurface.alignment
                                  );
-        if(tempSurface.image_data == NULL) {
+        if(tempSurface.image == NULL) {
             DEBUG_FUNCTION_LINE("VideoSquoosher: failed to allocate AA surface\n");
-            if(target->surface.image_data != NULL) {
-                MemoryUtils::free(target->surface.image_data);
-                target->surface.image_data = NULL;
+            if(target->surface.image != NULL) {
+                MemoryUtils::free(target->surface.image);
+                target->surface.image = NULL;
             }
             return;
         }
@@ -101,12 +101,12 @@ void TextureUtils::copyToTexture(GX2ColorBuffer* sourceBuffer, GX2Texture * targ
         GX2ResolveAAColorBuffer(sourceBuffer,&tempSurface, 0, 0);
         GX2CopySurface(&tempSurface, 0, 0,&target->surface, 0, 0);
 
-        if(tempSurface.image_data != NULL) {
-            MemoryUtils::free(tempSurface.image_data);
-            tempSurface.image_data = NULL;
+        if(tempSurface.image != NULL) {
+            MemoryUtils::free(tempSurface.image);
+            tempSurface.image = NULL;
         }
         GX2DrawDone();
-        GX2Invalidate(GX2_INVALIDATE_CPU, target->surface.image_data, target->surface.image_size);
+        GX2Invalidate(GX2_INVALIDATE_MODE_CPU, target->surface.image, target->surface.imageSize);
     }
 }
 
@@ -144,31 +144,31 @@ bool TextureUtils::convertImageToTexture(const uint8_t *img, int32_t imgSize, vo
     uint32_t height = (gdImageSY(gdImg));
 
     //! Initialize texture
-    GX2InitTexture(texture, width,  height, 1, 0, GX2_SURFACE_FORMAT_TCS_R8_G8_B8_A8_UNORM, GX2_SURFACE_DIM_2D, GX2_TILE_MODE_LINEAR_ALIGNED);
+    GX2InitTexture(texture, width,  height, 1, 0, GX2_SURFACE_FORMAT_UNORM_R8_G8_B8_A8, GX2_SURFACE_DIM_TEXTURE_2D, GX2_TILE_MODE_LINEAR_ALIGNED);
 
     //! if this fails something went horribly wrong
-    if(texture->surface.image_size == 0) {
+    if(texture->surface.imageSize == 0) {
         gdImageDestroy(gdImg);
         return false;
     }
 
-    texture->surface.image_data = MemoryUtils::alloc(texture->surface.image_size, texture->surface.align);
+    texture->surface.image = MemoryUtils::alloc(texture->surface.imageSize, texture->surface.alignment);
 
     //! check if memory is available for image
-    if(!texture->surface.image_data) {
+    if(!texture->surface.image) {
         gdImageDestroy(gdImg);
         return false;
     }
 
     //! set mip map data pointer
-    texture->surface.mip_data = NULL;
+    texture->surface.mipmaps = NULL;
 
-    gdImageToUnormR8G8B8A8(gdImg, (uint32_t*)texture->surface.image_data, texture->surface.width, texture->surface.height, texture->surface.pitch);
+    gdImageToUnormR8G8B8A8(gdImg, (uint32_t*)texture->surface.image, texture->surface.width, texture->surface.height, texture->surface.pitch);
 
     //! free memory of image as its not needed anymore
     gdImageDestroy(gdImg);
 
     //! invalidate the memory
-    GX2Invalidate(GX2_INVALIDATE_CPU_TEXTURE, texture->surface.image_data, texture->surface.image_size);
+    GX2Invalidate(GX2_INVALIDATE_MODE_CPU_TEXTURE, texture->surface.image, texture->surface.imageSize);
     return true;
 }

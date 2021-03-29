@@ -2,7 +2,10 @@
 #define RETAINS_VARS_H_
 #include "patcher/function_patcher.h"
 #include "plugin/dynamic_linking_defines.h"
-#include <dynamic_libs/gx2_functions.h>
+#include <gx2/surface.h>
+#include <gx2/texture.h>
+#include <gx2/context.h>
+#include <gx2/sampler.h>
 
 extern replacement_data_t gbl_replacement_data;
 extern dyn_linking_relocation_data_t gbl_dyn_linking_data;

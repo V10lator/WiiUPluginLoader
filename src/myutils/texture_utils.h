@@ -16,8 +16,8 @@
  ****************************************************************************/
 #ifndef __TEXTURE_UTILS_UTILS_H_
 #define __TEXTURE_UTILS_UTILS_H_
+#include "backwardComp.h"
 #include <stdint.h>
-#include <dynamic_libs/gx2_functions.h>
 #include <video/shaders/Texture2DShader.h>
 
 class TextureUtils {

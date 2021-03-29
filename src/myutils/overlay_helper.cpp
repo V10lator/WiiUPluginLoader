@@ -3,14 +3,15 @@
 #include <wups.h>
 #include "common/retain_vars.h"
 #include "overlay_helper.h"
-#include <dynamic_libs/gx2_functions.h>
+#include <gx2/mem.h>
+#include <gx2/display.h>
 
 uint32_t * getFromGX2Buffer(struct buffer_store store, uint32_t size) {
     if(store.buffer != NULL) {
         DEBUG_FUNCTION_LINE("We try to use the GX2 buffer. Needed space %08X (%d kb), available %08X (%d kb).\n",size,size/1024,store.buffer_size,store.buffer_size/1024);
         if(store.buffer_size >= size) {
             memset(store.buffer,0,store.buffer_size);
-            GX2Invalidate(GX2_INVALIDATE_CPU, store.buffer, store.buffer_size);
+            GX2Invalidate(GX2_INVALIDATE_MODE_CPU, store.buffer, store.buffer_size);
             return (uint32_t*) store.buffer;
         }
     }
@@ -152,11 +153,11 @@ void overlay_helper(wups_overlay_options_type_t screen, overlay_callback callbac
     }
 
     if(tv_store.buffer != NULL) {
-        GX2SetTVBuffer(tv_store.buffer,tv_store.buffer_size,tv_store.mode,tv_store.surface_format,tv_store.buffering_mode);
+        GX2SetTVBuffer(tv_store.buffer,tv_store.buffer_size,(GX2TVRenderMode)tv_store.mode,(GX2SurfaceFormat)tv_store.surface_format,(GX2BufferingMode)tv_store.buffering_mode);
     }
 
     if(drc_store.buffer != NULL) {
-        GX2SetDRCBuffer(drc_store.buffer,drc_store.buffer_size,drc_store.mode,drc_store.surface_format,drc_store.buffering_mode);
+        GX2SetDRCBuffer(drc_store.buffer,drc_store.buffer_size,(GX2DrcRenderMode)drc_store.mode,(GX2SurfaceFormat)drc_store.surface_format,(GX2BufferingMode)drc_store.buffering_mode);
     }
 
 error_exit:

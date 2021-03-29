@@ -4,7 +4,6 @@
 #include "common/retain_vars.h"
 #include "hooks_patcher.h"
 #include "myutils/overlay_helper.h"
-#include "myutils/ConfigUtils.h"
 #include <malloc.h>
 #include "main.h"
 #include "utils.h"
