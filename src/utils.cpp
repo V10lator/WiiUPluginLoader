@@ -160,3 +160,14 @@ void CallHookEx(wups_loader_hook_type_t hook_type, int32_t plugin_index_needed) 
         }
     }
 }
+
+bool isInMiiMakerHBL() {
+    if(OSGetTitleID == NULL)
+        return false;
+    
+    uint64_t tid = OSGetTitleID();
+    return tid == 0x0005000013374842 || // HBL
+        tid == 0x000500101004A200 ||    // mii maker eur
+        tid == 0x000500101004A100 ||    // mii maker usa
+        tid == 0x000500101004A000;      // mii maker jpn
+}

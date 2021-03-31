@@ -14,6 +14,8 @@ void CallHook(wups_loader_hook_type_t hook_type);
 
 void CallHookEx(wups_loader_hook_type_t hook_type, int32_t plugin_index_needed);
 
+bool isInMiiMakerHBL();
+
 #ifdef __cplusplus
 }
 #endif

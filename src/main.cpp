@@ -68,7 +68,6 @@ extern volatile uint8_t gSDInitDone;
 
 static void ApplyPatchesAndCallHookStartingApp();
 static void RestorePatches();
-int32_t isInMiiMakerHBL();
 void readAndPrintSegmentRegister(CThread *thread, void *arg);
 
 extern "C" int32_t Menu_Main(int32_t argc, char **argv) {
@@ -223,17 +222,6 @@ void RestorePatches() {
     }
     RestoreInvidualInstructions(method_hooks_hooks, method_hooks_size_hooks);
     RestoreInvidualInstructions(method_hooks_hooks_static, method_hooks_size_hooks_static);
-}
-
-int32_t isInMiiMakerHBL() {
-    if (OSGetTitleID != 0 && (
-                OSGetTitleID() == 0x000500101004A200 || // mii maker eur
-                OSGetTitleID() == 0x000500101004A100 || // mii maker usa
-                OSGetTitleID() == 0x000500101004A000 ||// mii maker jpn
-                OSGetTitleID() == 0x0005000013374842)) {
-        return 1;
-    }
-    return 0;
 }
 
 void Init() {

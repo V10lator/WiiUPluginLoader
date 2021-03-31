@@ -22,6 +22,7 @@
 #include "mymemory/memory_mapping.h"
 #include "plugin/PluginLoader.h"
 #include <vector>
+#include "utils.h"
 
 Application *Application::applicationInstance = NULL;
 
@@ -35,7 +36,7 @@ int32_t Application::exec() {
         PluginLoader * pluginLoader  = PluginLoader::getInstance();
         std::vector<PluginInformation *> pluginList;
         
-        if(OSGetTitleID() == 0x0005000013374842)
+        if(isInMiiMakerHBL())
         {
                 DEBUG_FUNCTION_LINE("HBL! Unloading...\n");
                 std::vector<PluginInformation *> pluginList = pluginLoader->getPluginsLoadedInMemory();
