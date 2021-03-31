@@ -33,33 +33,23 @@ Application::~Application() {
 
 int32_t Application::exec() {
         PluginLoader * pluginLoader  = PluginLoader::getInstance();
-        std::vector<PluginInformation *> pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
-        std::vector<PluginInformation *> pluginListLoaded = pluginLoader->getPluginsLoadedInMemory();
-        std::vector<PluginInformation*> willBeLoaded;
-        DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
+        std::vector<PluginInformation *> pluginList;
         
-        for (std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it) {
-                PluginInformation * curPlugin = *it;
-                DEBUG_FUNCTION_LINE("Found %s\n",curPlugin->getName().c_str());
-                bool skip = false;
-                
-                for (std::vector<PluginInformation *>::iterator itOther = pluginListLoaded.begin() ; itOther != pluginListLoaded.end(); ++itOther) {
-                        PluginInformation * otherPlugin = *itOther;
-                        if(otherPlugin->getPath().compare(curPlugin->getPath()) == 0) {
-                                DEBUG_FUNCTION_LINE("Alread loaded, skipping!\n");
-                                skip = true;
-                                break;
-                        }
+        if(OSGetTitleID() == 0x0005000013374842)
+        {
+                DEBUG_FUNCTION_LINE("HBL! Unloading...\n");
+                std::vector<PluginInformation *> pluginList = pluginLoader->getPluginsLoadedInMemory();
+                if(pluginList.size() != 0)
+                {
+                        pluginLoader->clearPluginInformation(pluginList);
+                        pluginLoader->resetPluginLoader();
                 }
-                if(skip)
-                        continue;
-
-                DEBUG_FUNCTION_LINE("We want to link %s\n",curPlugin->getName().c_str());
-                willBeLoaded.push_back(curPlugin);
+                DEBUG_FUNCTION_LINE("Done!...\n");
+                return APPLICATION_CLOSE_MIIMAKER;
         }
         
-        pluginLoader->clearPluginInformation(pluginListLoaded);
-        pluginLoader->loadAndLinkPlugins(willBeLoaded);
-        
+        pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
+        DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
+        pluginLoader->loadAndLinkPlugins(pluginList);
         return APPLICATION_CLOSE_APPLY;
 }
