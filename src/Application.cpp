@@ -68,12 +68,12 @@ int32_t Application::exec() {
                 
                 while(getline(cfgStream, cfgEntry))
                 {
-                        for(std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it)
+                        cfgEntry = cfgEntry.substr(0, cfgEntry.size() - 1);
+                        for(std::vector<PluginInformation *>::iterator it = pluginList.begin(); it != pluginList.end(); ++it)
                         {
                                 plugin = *it;
                                 name = plugin->getPath().substr(toCut);
                                 name = name.substr(0, name.size() - 4);
-                                DEBUG_FUNCTION_LINE("DEBUG: %s vs. %s\n", name.c_str(), cfgEntry.c_str());
                                 if(name.compare(cfgEntry) == 0)
                                         toLoad.push_back(plugin);
                         }
