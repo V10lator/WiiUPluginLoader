@@ -3,7 +3,7 @@
   <name>Wii U Plugin Autoloader</name>
   <coder>Maschell % V10lator</coder>
   <url>https://github.com/V10lator/WiiUPluginLoader</url>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <release_date>201802103162900</release_date>
   <short_description>Plugin loader for the Wii U / no-GUI</short_description>
   <long_description>
