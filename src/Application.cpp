@@ -54,26 +54,33 @@ int32_t Application::exec() {
         pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
         DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
         
+        std::vector<PluginInformation *> toLoad;
         std::ifstream cfgStream(WUPS_AUTO_CONF);
+        
         if(cfgStream.fail())
-                pluginLoader->loadAndLinkPlugins(pluginList);
+                toLoad = pluginList;
         else
         {
-                std::vector<PluginInformation *> toLoad;
                 PluginInformation *plugin;
-                std::string cfgEntry;
+                std::string cfgEntry = WUPS_PLUGIN_PATH;
+                size_t toCut = cfgEntry.size() + 1;
+                std::string name;
+                
                 while(getline(cfgStream, cfgEntry))
                 {
                         for(std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it)
                         {
                                 plugin = *it;
-                                if(plugin->getName().compare(cfgEntry) == 0)
+                                name = plugin->getPath().substr(toCut);
+                                name = name.substr(0, name.size() - 4);
+                                DEBUG_FUNCTION_LINE("DEBUG: %s vs. %s\n", name.c_str(), cfgEntry.c_str());
+                                if(name.compare(cfgEntry) == 0)
                                         toLoad.push_back(plugin);
                         }
                 }
-                DEBUG_FUNCTION_LINE("Loading %i plugins\n", toLoad.size());
-                pluginLoader->loadAndLinkPlugins(toLoad);
         }
         
+        DEBUG_FUNCTION_LINE("Loading %i plugins\n", toLoad.size());
+        pluginLoader->loadAndLinkPlugins(toLoad);
         return APPLICATION_CLOSE_APPLY;
 }
