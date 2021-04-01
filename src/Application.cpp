@@ -23,6 +23,8 @@
 #include "plugin/PluginLoader.h"
 #include <vector>
 #include "utils.h"
+#include <iterator>
+#include <fstream>
 
 Application *Application::applicationInstance = NULL;
 
@@ -51,6 +53,27 @@ int32_t Application::exec() {
         
         pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
         DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
-        pluginLoader->loadAndLinkPlugins(pluginList);
+        
+        std::ifstream cfgStream(WUPS_AUTO_CONF);
+        if(cfgStream.fail())
+                pluginLoader->loadAndLinkPlugins(pluginList);
+        else
+        {
+                std::vector<PluginInformation *> toLoad;
+                PluginInformation *plugin;
+                std::string cfgEntry;
+                while(getline(cfgStream, cfgEntry))
+                {
+                        for(std::vector<PluginInformation *>::iterator it = pluginList.begin() ; it != pluginList.end(); ++it)
+                        {
+                                plugin = *it;
+                                if(plugin->getName().compare(cfgEntry) == 0)
+                                        toLoad.push_back(plugin);
+                        }
+                }
+                DEBUG_FUNCTION_LINE("Loading %i plugins\n", toLoad.size());
+                pluginLoader->loadAndLinkPlugins(toLoad);
+        }
+        
         return APPLICATION_CLOSE_APPLY;
 }

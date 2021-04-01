@@ -32,6 +32,7 @@ extern "C" {
 #define PLUGIN_FILE_EXT             ".mod"
 
 #define WUPS_PLUGIN_PATH            SD_PATH WIIU_PATH "/plugins"
+#define WUPS_AUTO_CONF              WUPS_PLUGIN_PATH "/autoload.txt"
 #define WUPS_TEMP_PLUGIN_PATH       SD_PATH WIIU_PATH "/plugins/temp"
 #define WUPS_TEMP_PLUGIN_FILE       WUPS_TEMP_PLUGIN_PATH "/temp" PLUGIN_FILE_EXT
 
