@@ -38,7 +38,7 @@ int32_t Application::exec() {
         PluginLoader * pluginLoader  = PluginLoader::getInstance();
         std::vector<PluginInformation *> pluginList;
         
-        if(isInMiiMakerHBL())
+/*        if(isInMiiMakerHBL())
         {
                 DEBUG_FUNCTION_LINE("HBL! Unloading...\n");
                 std::vector<PluginInformation *> pluginList = pluginLoader->getPluginsLoadedInMemory();
@@ -50,7 +50,7 @@ int32_t Application::exec() {
                 DEBUG_FUNCTION_LINE("Done!...\n");
                 return APPLICATION_CLOSE_MIIMAKER;
         }
-        
+*/        
         pluginList = pluginLoader->getPluginInformation(WUPS_PLUGIN_PATH);
         DEBUG_FUNCTION_LINE("Found %i plugins at "WUPS_PLUGIN_PATH"\n", pluginList.size());
         
