@@ -25,6 +25,7 @@
 #include "utils.h"
 #include <iterator>
 #include <fstream>
+#include <algorithm>
 
 Application *Application::applicationInstance = NULL;
 
@@ -68,7 +69,8 @@ int32_t Application::exec() {
                 
                 while(getline(cfgStream, cfgEntry))
                 {
-                        cfgEntry = cfgEntry.substr(0, cfgEntry.size() - 1);
+                        cfgEntry.erase(std::remove(cfgEntry.begin(), cfgEntry.end(), '\r'), cfgEntry.end()); // DOS2Unix
+                        cfgEntry.erase(std::remove(cfgEntry.begin(), cfgEntry.end(), '\n'), cfgEntry.end());
                         for(std::vector<PluginInformation *>::iterator it = pluginList.begin(); it != pluginList.end(); ++it)
                         {
                                 plugin = *it;
